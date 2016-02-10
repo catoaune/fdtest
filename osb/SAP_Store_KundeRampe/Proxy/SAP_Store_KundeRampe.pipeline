@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oper="http://xmlns.oracle.com/servicebus/pipeline/operations">
+    <con:coreEntry>
+        <con:binding type="SOAP" isSoap12="false" xsi:type="con:SoapBindingType">
+            <con:wsdl ref="SAP_Store_KundeRampe/WSDL/no_norgesgruppen_intgr_kontrakter_tjenestekontrakter_SAP_StoreERPReplicationBulkRequest_Out_0_0_1-SNAPSHOT" xmlns:con3="http://www.bea.com/wli/sb/stages/publish/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:con5="http://www.bea.com/wli/sb/services/bindings/config" xmlns:con4="http://www.bea.com/wli/sb/stages/routing/config" xmlns:ser="http://www.bea.com/wli/sb/services" xmlns:http="http://www.bea.com/wli/sb/transports/http" xmlns:env="http://www.bea.com/wli/config/env" xmlns:tran="http://www.bea.com/wli/sb/transports" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config"/>
+            <con:binding>
+                <con:name>StoreERPReplicationBulkRequest_OutBinding</con:name>
+                <con:namespace>http://sap.com/xi/EA-RETAIL/Global2</con:namespace>
+            </con:binding>
+        </con:binding>
+        <oper:operations>
+            <oper:monitoring enabled="false" aggregationInterval="10" level="pipeline"/>
+            <oper:reporting>true</oper:reporting>
+            <oper:logging enabled="true" level="debug"/>
+            <oper:sla-alerting enabled="true" level="normal"/>
+            <oper:pipeline-alerting enabled="true" level="normal"/>
+        </oper:operations>
+    </con:coreEntry>
+    <con:router errorHandler="_onErrorHandler-4618852469033169805-f2cc351.14b58bd21a8.-8000" xmlns:ser="http://www.bea.com/wli/sb/services" xmlns:tran="http://www.bea.com/wli/sb/transports" xmlns:env="http://www.bea.com/wli/config/env" xmlns:http="http://www.bea.com/wli/sb/transports/http" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:con3="http://www.bea.com/wli/sb/stages/publish/config" xmlns:con4="http://www.bea.com/wli/sb/stages/routing/config">
+        <con:pipeline type="request" name="PipelinePairNode_request">
+            <con:stage name="Assing vars for logging">
+                <con:context/>
+                <con:actions>
+                    <con1:assign varName="appTrackingID">
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7fff</con2:id>
+                        <con1:expr>
+                            <con2:xqueryText>if (fn:string($body/CorrectThisPath) != "") then
+    concat("somethingThatLooksLikeAnId = ", $body/CorrectThisPath)
+else
+    $messageID</con2:xqueryText>
+                        </con1:expr>
+                    </con1:assign>
+                    <con1:assign varName="msgTrackingID">
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ffe</con2:id>
+                        <con1:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con1:expr>
+                    </con1:assign>
+                </con:actions>
+            </con:stage>
+            <con:stage name="LogRequest">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ffd</con2:id>
+                        <con3:service ref="CSF_OSB/Business Services/Tracking/Services/BS_CSF_TrackMessage" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:operation>tracking</con3:operation>
+                        <con3:outboundTransform>
+                            <con1:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ffc</con2:id>
+                                <con1:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="F000T00_Felles/Mapping/F000T00_Felles_tTrackingService_V2.0"/>
+                                        <con2:param name="body">
+                                            <con2:path>fn-bea:serialize($body/*[1])</con2:path>
+                                        </con2:param>
+                                        <con2:param name="messageID">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingSummary">
+                                            <con2:path>concat("Update tracking summary")</con2:path>
+                                        </con2:param>
+                                        <con2:param name="msgTrackingID">
+                                            <con2:path>$msgTrackingID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingDetails">
+                                            <con2:path>concat("Update tracking details")</con2:path>
+                                        </con2:param>
+                                        <con2:param name="appTrackingID">
+                                            <con2:path>$appTrackingID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="isError">
+                                            <con2:path>"N"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="invocationPoint">
+                                            <con2:path>"Request received"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceName">
+                                            <con2:path>"SAP_Store_KundeRampe"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con1:expr>
+                            </con1:replace>
+                        </con3:outboundTransform>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+            <con:stage name="LogTransformedRequest">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ffb</con2:id>
+                        <con3:service ref="CSF_OSB/Business Services/Tracking/Services/BS_CSF_TrackMessage" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:operation>tracking</con3:operation>
+                        <con3:outboundTransform>
+                            <con1:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ffa</con2:id>
+                                <con1:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="F000T00_Felles/Mapping/F000T00_Felles_tTrackingService_V2.0"/>
+                                        <con2:param name="body">
+                                            <con2:path>fn-bea:serialize($body/*[1])</con2:path>
+                                        </con2:param>
+                                        <con2:param name="messageID">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingSummary">
+                                            <con2:path>concat("Change this tracking summary")</con2:path>
+                                        </con2:param>
+                                        <con2:param name="msgTrackingID">
+                                            <con2:path>$msgTrackingID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingDetails">
+                                            <con2:path>concat("Change these tracking details")</con2:path>
+                                        </con2:param>
+                                        <con2:param name="appTrackingID">
+                                            <con2:path>$appTrackingID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="isError">
+                                            <con2:path>"N"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="invocationPoint">
+                                            <con2:path>"Request transformed"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceName">
+                                            <con2:path>"SAP_Store_KundeRampe"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con1:expr>
+                            </con1:replace>
+                        </con3:outboundTransform>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+            <con:stage id="_StageId-N53e5ed1b.N4bcc07ee.0.152b7303420.N8000" name="Send to queue">
+                <con:comment>Will be replaced by Rampe</con:comment>
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-N53e5ed1b.N4bcc07ee.0.152b7303420.N7ffd</con2:id>
+                        <con3:service ref="SAP_Store_KundeRampe/Business/SAPToBBR" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:outboundTransform/>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="PipelinePairNode_response"/>
+        <con:pipeline type="error" name="_onErrorHandler-4618852469033169805-f2cc351.14b58bd21a8.-8000">
+            <con:stage name="TrackError">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff9</con2:id>
+                        <con3:service ref="CSF_OSB/Business Services/Tracking/Services/BS_CSF_TrackMessage" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:operation>tracking</con3:operation>
+                        <con3:outboundTransform>
+                            <con1:replace contents-only="true" varName="body">
+                                <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff8</con2:id>
+                                <con1:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="F000T00_Felles/Mapping/F000T00_Felles_tTrackingService_V2.0"/>
+                                        <con2:param name="body">
+                                            <con2:path>fn-bea:serialize($body/*[1])</con2:path>
+                                        </con2:param>
+                                        <con2:param name="messageID">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingSummary">
+                                            <con2:path>"Processing terminated"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="msgTrackingID">
+                                            <con2:path>if (fn:string($msgTrackingID) != "") then
+    $msgTrackingID
+else
+    $messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="trackingDetails">
+                                            <con2:path>""</con2:path>
+                                        </con2:param>
+                                        <con2:param name="appTrackingID">
+                                            <con2:path>if (fn:string($appTrackingID) != "") then
+    $appTrackingID
+else
+    $messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="isError">
+                                            <con2:path>"Y"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="invocationPoint">
+                                            <con2:path>"Processing terminated"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceName">
+                                            <con2:path>"SAP_Store_KundeRampe"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con1:expr>
+                            </con1:replace>
+                        </con3:outboundTransform>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+            <con:stage name="LogError">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff7</con2:id>
+                        <con3:service ref="CSF_OSB/Business Services/Logging/Services/BS_CSF_LogMessage" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:operation>logging</con3:operation>
+                        <con3:outboundTransform>
+                            <con1:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff6</con2:id>
+                                <con1:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="F000T00_Felles/Mapping/F000T00_Felles_tLoggingService_V2.0"/>
+                                        <con2:param name="logSummary">
+                                            <con2:path>"Logging the Error Details"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="messageID">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceOperation">
+                                            <con2:path>if (fn:exists($inbound/ctx:service/ctx:operation/text())) then 
+    data($inbound/ctx:service/ctx:operation)
+else
+    "Get"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="contentType">
+                                            <con2:path>if (fn:exists($inbound/ctx:transport/ctx:response/tp:headers/http:Content-Type/text())) then 
+    data($inbound/ctx:transport/ctx:response/tp:headers/http:Content-Type)
+else
+    "Binary"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="body">
+                                            <con2:path>$fault</con2:path>
+                                        </con2:param>
+                                        <con2:param name="errorCode">
+                                            <con2:path>data($fault/ctx:errorCode)</con2:path>
+                                        </con2:param>
+                                        <con2:param name="servicePath">
+                                            <con2:path>if (fn:matches($inbound/ctx:transport/ctx:uri, "^(jca://)|(jms://)|(file://).+") or not(fn:string($inbound/ctx:transport/ctx:uri))) then
+    fn:concat('/', fn:substring-after(fn:replace($inbound/@name, '\$', '/'), '/'))
+else
+    data($inbound/ctx:transport/ctx:uri)</con2:path>
+                                        </con2:param>
+                                        <con2:param name="logDetails">
+                                            <con2:path>fn:concat("FaultDetails: ", data($fault/ctx:details), "Fault Reason: ", data($fault/ctx:reason))</con2:path>
+                                        </con2:param>
+                                        <con2:param name="payloadHeader">
+                                            <con2:path>$inbound</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceName">
+                                            <con2:path>"SAP_Store_KundeRampe"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con1:expr>
+                            </con1:replace>
+                        </con3:outboundTransform>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+            <con:stage name="NotifyAboutError">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff5</con2:id>
+                        <con3:service ref="CSF_OSB/Business Services/Notification/Services/BS_CSF_NotificationMessage" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:operation>notification</con3:operation>
+                        <con3:outboundTransform>
+                            <con1:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff4</con2:id>
+                                <con1:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="F000T00_Felles/Mapping/F000T00_Felles_tNotificationService"/>
+                                        <con2:param name="messageID">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="emailSubject">
+                                            <con2:path>fn:concat("ServiceName: ", fn:tokenize($inbound/@name, '\$')[last()], ", Error: ", if (fn:data($fault/ctx:errorCode) != "" ) 
+            then fn:data($fault/ctx:errorCode) 
+else 'an error occured')</con2:path>
+                                        </con2:param>
+                                        <con2:param name="emailBody">
+                                            <con2:path>fn:concat(
+    "An error occured in OSB service ", fn:tokenize($inbound/@name, '\$')[last()], "&amp;#13;",
+    "Timestamp: ", fn:current-dateTime(), "&amp;#13;",
+    "messageID: ", $messageID, "&amp;#13;",
+    "appTrackingID: ", $appMessageID
+)</con2:path>
+                                        </con2:param>
+                                        <con2:param name="body">
+                                            <con2:path>$fault</con2:path>
+                                        </con2:param>
+                                        <con2:param name="errorCode">
+                                            <con2:path>data($fault/ctx:errorCode)</con2:path>
+                                        </con2:param>
+                                        <con2:param name="serviceName">
+                                            <con2:path>"SAP_Store_KundeRampe"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con1:expr>
+                            </con1:replace>
+                        </con3:outboundTransform>
+                    </con3:route>
+                </con:actions>
+            </con:stage>
+            <con:stage name="ReplyWithFailure">
+                <con:context/>
+                <con:actions>
+                    <con2:reply isError="true">
+                        <con2:id>_ActionId-4618852469033169805-f2cc351.14b58bd21a8.-7ff3</con2:id>
+                    </con2:reply>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="PipelinePairNode">
+                <con:request>PipelinePairNode_request</con:request>
+                <con:response>PipelinePairNode_response</con:response>
+            </con:pipeline-node>
+            <con:route-node name="RouteNode1">
+                <con:context/>
+                <con:actions>
+                    <con4:route>
+                        <con2:id>_ActionId-5104777765211306398--11f36a5a.14dddb78153.-7fbf</con2:id>
+                        <con4:service ref="SAP_Store_KundeRampe/Business/SAPToKundeRampe" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con4:outboundTransform>
+                            <con1:transport-headers>
+                                <con2:id>_ActionId-5104777765211306398--11f36a5a.14dddb78153.-7fa4</con2:id>
+                                <con1:header-set>outbound-request</con1:header-set>
+                            </con1:transport-headers>
+                        </con4:outboundTransform>
+                        <con4:responseTransform/>
+                    </con4:route>
+                </con:actions>
+            </con:route-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>
