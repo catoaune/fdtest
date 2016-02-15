@@ -11,7 +11,7 @@
 
     <modules>
         <module>System</module>
-        <module>SAP_Store_KundeRampe</module>
+        <module>Ping</module>
     </modules>
 
 </project>
