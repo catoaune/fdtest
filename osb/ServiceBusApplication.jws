@@ -28,7 +28,6 @@
    </list>
    <list n="listOfChildren">
       <hash><url n="URL" path="Ping/Ping.jpr"/></hash>
-      <hash><url n="URL" path="SAP_Store_KundeRampe/SAP_Store_KundeRampe.jpr"/></hash>
    </list>
    <hash n="oracle.jdeveloper.deploy.dt.DeploymentProfiles">
       <hash n="profileDefinitions">
